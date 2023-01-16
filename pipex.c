@@ -99,8 +99,9 @@ int main(int argc, char *argv[], char **env)
         int id = fork();
         if (id == -1)
         {
-            perror("Error in fork");
-            exit(1);
+            //perror("Error in fork");
+            write(2, "Error in fork", 13);
+			exit(1);
         }
         if (id == 0)
         {
