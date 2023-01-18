@@ -1,4 +1,0 @@
-#!/bin/bash
-echo "Hello"
-echo $VAR1
-echo $VAR2

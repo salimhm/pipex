@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   pipex_utils.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: shmimi <shmimi@student.1337.ma>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/01/18 12:52:41 by shmimi            #+#    #+#             */
+/*   Updated: 2023/01/18 12:58:11 by shmimi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "pipex.h"
 
 size_t	ft_strlen(const char *s)
@@ -10,89 +22,6 @@ size_t	ft_strlen(const char *s)
 		i++;
 	}
 	return (i);
-}
-
-static int	count_words(char *s, char delimeter)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	while (s[i] != '\0')
-	{
-		while (s[i] == delimeter && s[i])
-			i++;
-		if (s[i] == '\0')
-			break ;
-		while (s[i] != delimeter && s[i])
-			i++;
-		count++;
-	}
-	return (count);
-}
-
-static int	count_chars(char *s, char c, int *st)
-{
-	int	i;
-
-	i = 0;
-	while (s[*st] != c && s[*st])
-	{
-		i++;
-		(*st)++;
-	}
-	return (i);
-}
-
-static void	assign(char *s, char delimeter, char **tab, int word_counts)
-{
-	int	i;
-	int	fixed;
-	int	second_dimension;
-
-	i = 0;
-	fixed = 0;
-	while (i < word_counts)
-	{
-		second_dimension = 0;
-		while (s[fixed] == delimeter && s[fixed])
-			fixed++;
-		while (s[fixed] != delimeter && s[fixed])
-			tab[i][second_dimension++] = s[fixed++];
-		tab[i][second_dimension] = 0;
-		i++;
-	}
-	tab[i] = 0;
-}
-
-char	**ft_split(char const *s, char c)
-{
-	int		i;
-	char	**tab;
-	int		cw;
-	int		st;
-
-	i = 0;
-	st = 0;
-	if (s)
-	{
-		cw = count_words((char *)s, c);
-		tab = (char **)malloc(sizeof(char *) * (cw + 1));
-		if (!tab)
-			return (0);
-		while (i < cw)
-		{
-			while (s[st] == c && s[st])
-				st++;
-			tab[i++] = (char *)malloc(count_chars((char *)s, c, &st) + 1);
-			if (!s[i - 1])
-				return (0);
-		}
-		assign((char *)s, c, tab, cw);
-		return (tab);
-	}
-	return (0);
 }
 
 char	*ft_strchr(const char *s, int c)
@@ -182,39 +111,5 @@ char	*ft_strrchr(const char *s, int c)
 	}
 	if (s[0] == (char)c)
 		return ((char *)s);
-	return (0);
-}
-
-void	ft_putstr_fd(char *s, int fd)
-{
-	size_t	i;
-
-	if (s)
-	{
-		i = 0;
-		while (i <= ft_strlen(s) && s[i])
-			write(fd, &s[i++], 1);
-	}
-}
-
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	size_t			i;
-	unsigned char	*ss1;
-	unsigned char	*ss2;
-
-	ss1 = (unsigned char *)s1;
-	ss2 = (unsigned char *)s2;
-	i = 0;
-	if (n == 0)
-		return (0);
-	while (i < n && ss1[i] != '\0')
-	{
-		if (ss1[i] != ss2[i])
-			return (ss1[i] - ss2[i]);
-		i++;
-	}
-	if (ss1[i] == '\0' && i < n)
-		return (ss1[i] - ss2[i]);
 	return (0);
 }
