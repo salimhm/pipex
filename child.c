@@ -6,7 +6,7 @@
 /*   By: shmimi <shmimi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/18 13:04:17 by shmimi            #+#    #+#             */
-/*   Updated: 2023/01/18 13:06:01 by shmimi           ###   ########.fr       */
+/*   Updated: 2023/01/21 00:14:02 by shmimi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,15 +65,19 @@ void	ft_conditions_child3(char *argv2, char **env)
 	i = 0;
 	while (argv2[i])
 	{
+		test = ft_split(argv2, ' ');
 		if (argv2[i] == ' ')
 		{
-			test = ft_split(argv2, ' ');
-			if (access(test[0], F_OK) == 0 && access(test[0], X_OK) == 0)
+			if (access(test[0], F_OK & X_OK) == 0)
 			{
 				cmd1 = test[0];
 				break ;
 			}
 		}
+		else if (access(test[0], F_OK) != 0)
+			cmd_error(argv2);
+		else if (access(argv2, X_OK | R_OK) != 0)
+			no_xr_perm(argv2);
 		i++;
 	}
 }
@@ -91,6 +95,8 @@ void	ft_conditions_child4(char *argv2, char **env)
 		test = ft_split(ft_strrchr(argv2, '/'), ' ');
 		execve(check_valid_cmd(cmd1, path), test, env);
 	}
+	else if (access(check_valid_cmd(cmd1, path), F_OK) != 0)
+		cmd_error(argv2);
 }
 
 void	ft_conditions_child5(char *argv2, char **env)
@@ -103,9 +109,6 @@ void	ft_conditions_child5(char *argv2, char **env)
 	cmd1 = check_valid_cmd(argv2, path);
 	cmds = ft_split(argv2, ' ');
 	if (access(cmd1, F_OK) != 0)
-	{
 		cmd_error(argv2);
-		exit(127);
-	}
 	execve(cmd1, cmds, env);
 }

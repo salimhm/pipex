@@ -6,7 +6,7 @@
 /*   By: shmimi <shmimi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/16 03:36:13 by shmimi            #+#    #+#             */
-/*   Updated: 2023/01/18 13:10:58 by shmimi           ###   ########.fr       */
+/*   Updated: 2023/01/21 23:30:41 by shmimi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,14 @@ void	child(char *argv1, int fds[2])
 	int	infile;
 
 	close(0);
-	infile = open(argv1, O_RDONLY | O_CREAT, 0666);
+	if (access(argv1, F_OK | R_OK) != 0)
+	{
+		write(2, "pipex: no such file or directory: ", 34);
+		write(2, argv1, ft_strlen(argv1));
+		write(2, "\n", 1);
+		exit(0);
+	}
+	infile = open(argv1, O_RDONLY, 0666);
 	if (infile == -1)
 		exit(1);
 	dup2(fds[1], 1);
@@ -25,7 +32,7 @@ void	child(char *argv1, int fds[2])
 	close(fds[1]);
 }
 
-char	**get_path(char *const *env)
+char	**get_path(char **env)
 {
 	char	**path;
 	int		i;
@@ -57,28 +64,28 @@ char	*check_valid_cmd(char *cmd, char **cmds)
 {
 	int		i;
 	char	*valid_path;
+	char	*lol;
 	char	**tmp;
 
 	i = 0;
 	tmp = ft_split(cmd, ' ');
 	while (cmds[i])
 	{
-		valid_path = ft_strjoin(cmds[i], "/");
-		valid_path = ft_strjoin(valid_path, tmp[0]);
+		lol = ft_strjoin(cmds[i], "/");
+		valid_path = ft_strjoin(lol, tmp[0]);
+		free(lol);
 		if (access(valid_path, F_OK) == 0)
-			return (valid_path);
+		{
+			lol = malloc(ft_strlen(valid_path) + 1);
+			ft_strlcpy(lol, valid_path, ft_strlen(valid_path) + 1);
+			free2d(tmp);
+			free(valid_path);
+			return (lol);
+		}
 		i++;
+		free(valid_path);
 	}
-	return (0);
-}
-
-void	*cmd_error(char *cmd)
-{
-	char	*cmdd;
-
-	cmdd = ft_strjoin("pipex: ", cmd);
-	cmdd = ft_strjoin(cmdd, ": command not found\n");
-	write(2, cmdd, ft_strlen(cmdd));
+	double_free2d(cmds, tmp);
 	return (0);
 }
 
@@ -86,7 +93,6 @@ int	main(int argc, char *argv[], char **env)
 {
 	char	**path;
 	int		fds[2];
-	int		id;
 	char	*cmd2;
 
 	if (argc > 4)
@@ -98,13 +104,14 @@ int	main(int argc, char *argv[], char **env)
 		check(path, argv[2], argv[3], env);
 		pipe(fds);
 		ft_fork_child_check(argv[1], argv[2], fds, env);
-		id = fork();
-		if (id > 0)
+		if (fork() > 0)
 		{
+			fork_check(argv[3]);
 			cmd2 = check_valid_cmd(argv[3], path);
 			parent(argv[4], fds);
 			ft_fork_parent(cmd2, argv[3], env, path);
 		}
+		free2d(path);
 	}
 	else
 		exit(EXIT_FAILURE);

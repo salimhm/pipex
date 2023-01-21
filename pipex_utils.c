@@ -6,7 +6,7 @@
 /*   By: shmimi <shmimi@student.1337.ma>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/18 12:52:41 by shmimi            #+#    #+#             */
-/*   Updated: 2023/01/18 12:58:11 by shmimi           ###   ########.fr       */
+/*   Updated: 2023/01/20 20:13:54 by shmimi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	size_t	j;
 
 	if (!s1)
-		return (0);
+		return (ft_strdup(0));
 	new_str = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	str1 = (char *)s1;
 	str2 = (char *)s2;
